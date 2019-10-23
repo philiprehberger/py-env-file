@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "philiprehberger-env-file"
-version = "0.1.0"
+version = "0.1.1"
 description = ".env file parser with interpolation and multi-file support"
 readme = "README.md"
 license = "MIT"
@@ -20,9 +20,10 @@ classifiers = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/philiprehberger/py-env-file"
+Homepage = "https://github.com/philiprehberger/py-env-file#readme"
 Repository = "https://github.com/philiprehberger/py-env-file"
 Issues = "https://github.com/philiprehberger/py-env-file/issues"
+Changelog = "https://github.com/philiprehberger/py-env-file/blob/main/CHANGELOG.md"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/philiprehberger_env_file"]
