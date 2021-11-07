@@ -65,6 +65,14 @@ HOST=localhost # this is a comment
 - `load_env(*paths, override=True)` — Load .env files into `os.environ`, returns dict of loaded vars
 - `parse_env_file(path)` — Parse a .env file, returns dict without modifying environment
 
+
+## Development
+
+```bash
+pip install -e .
+python -m pytest tests/ -v
+```
+
 ## License
 
 MIT
