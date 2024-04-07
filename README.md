@@ -2,8 +2,7 @@
 
 [![Tests](https://github.com/philiprehberger/py-env-file/actions/workflows/publish.yml/badge.svg)](https://github.com/philiprehberger/py-env-file/actions/workflows/publish.yml)
 [![PyPI version](https://img.shields.io/pypi/v/philiprehberger-env-file.svg)](https://pypi.org/project/philiprehberger-env-file/)
-[![License](https://img.shields.io/github/license/philiprehberger/py-env-file)](LICENSE)
-[![Sponsor](https://img.shields.io/badge/sponsor-GitHub%20Sponsors-ec6cb9)](https://github.com/sponsors/philiprehberger)
+[![Last updated](https://img.shields.io/github/last-commit/philiprehberger/py-env-file)](https://github.com/philiprehberger/py-env-file/commits/main)
 
 .env file parser with interpolation and multi-file support.
 
@@ -66,7 +65,6 @@ HOST=localhost # this is a comment
 - `load_env(*paths, override=True)` — Load .env files into `os.environ`, returns dict of loaded vars
 - `parse_env_file(path)` — Parse a .env file, returns dict without modifying environment
 
-
 ## Development
 
 ```bash
@@ -74,6 +72,24 @@ pip install -e .
 python -m pytest tests/ -v
 ```
 
+## Support
+
+If you find this project useful:
+
+⭐ [Star the repo](https://github.com/philiprehberger/py-env-file)
+
+🐛 [Report issues](https://github.com/philiprehberger/py-env-file/issues?q=is%3Aissue+is%3Aopen+label%3Abug)
+
+💡 [Suggest features](https://github.com/philiprehberger/py-env-file/issues?q=is%3Aissue+is%3Aopen+label%3Aenhancement)
+
+❤️ [Sponsor development](https://github.com/sponsors/philiprehberger)
+
+🌐 [All Open Source Projects](https://philiprehberger.com/open-source-packages)
+
+💻 [GitHub Profile](https://github.com/philiprehberger)
+
+🔗 [LinkedIn Profile](https://www.linkedin.com/in/philiprehberger)
+
 ## License
 
-MIT
+[MIT](LICENSE)
