@@ -1,5 +1,9 @@
 # philiprehberger-env-file
 
+[![Tests](https://github.com/philiprehberger/py-env-file/actions/workflows/publish.yml/badge.svg)](https://github.com/philiprehberger/py-env-file/actions/workflows/publish.yml)
+[![PyPI version](https://img.shields.io/pypi/v/philiprehberger-env-file.svg)](https://pypi.org/project/philiprehberger-env-file/)
+[![License](https://img.shields.io/github/license/philiprehberger/py-env-file)](LICENSE)
+
 .env file parser with interpolation and multi-file support.
 
 ## Installation
