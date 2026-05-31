@@ -1,4 +1,10 @@
 # Changelog
+
+## 0.2.0 (2026-05-30)
+
+- Add `dump_env()` for writing dicts to .env files with quoting
+- Add `merge_env()` for parsing multiple .env files into a single dict without touching `os.environ`
+
 ## 0.1.6- Standardize README structure and fix compliance issues
 ## 0.1.5- Add pytest and mypy tool configuration to pyproject.toml
 

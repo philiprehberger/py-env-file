@@ -8,11 +8,14 @@ from pathlib import Path
 
 
 __all__ = [
+    "dump_env",
     "load_env",
+    "merge_env",
     "parse_env_file",
 ]
 
 _INTERPOLATION_RE = re.compile(r"\$\{([^}]+)\}|\$([A-Za-z_][A-Za-z0-9_]*)")
+_KEY_RE = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*$")
 
 
 def load_env(
@@ -101,7 +104,7 @@ def _parse_line(line: str, env: dict[str, str]) -> tuple[str, str] | None:
     key, _, raw_value = stripped.partition("=")
     key = key.strip()
 
-    if not key or not re.match(r"^[A-Za-z_][A-Za-z0-9_]*$", key):
+    if not key or not _KEY_RE.match(key):
         return None
 
     raw_value = raw_value.strip()
@@ -130,3 +133,67 @@ def _interpolate(value: str, env: dict[str, str]) -> str:
         return os.environ.get(var_name, match.group(0))
 
     return _INTERPOLATION_RE.sub(replace_match, value)
+
+
+def dump_env(
+    data: dict[str, str],
+    path: str | Path,
+    *,
+    quote: bool = True,
+) -> None:
+    """Write *data* to *path* as a .env file.
+
+    Args:
+        data: Mapping of KEY → VALUE.
+        path: Destination file path. Parent directories are created.
+        quote: When True (default), values containing whitespace, ``#``,
+            ``"``, ``'``, or starting/ending with whitespace are wrapped
+            in double quotes (with embedded ``"`` and ``\\n`` escaped).
+            Values without those characters are written unquoted.
+
+    Raises:
+        ValueError: If any key is not a valid identifier
+            (``^[A-Za-z_][A-Za-z0-9_]*$``).
+    """
+    lines: list[str] = []
+    for key, value in data.items():
+        if not _KEY_RE.match(key):
+            msg = f"Invalid key: {key!r}"
+            raise ValueError(msg)
+
+        if quote and _needs_quoting(value):
+            escaped = (
+                value.replace('"', '\\"')
+                .replace("\n", "\\n")
+                .replace("\t", "\\t")
+            )
+            lines.append(f'{key}="{escaped}"')
+        else:
+            lines.append(f"{key}={value}")
+
+    out_path = Path(path)
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    out_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+
+def merge_env(*paths: str | Path) -> dict[str, str]:
+    """Parse multiple .env files and return the merged dict.
+
+    Files are parsed in order; later files override earlier ones.
+    Missing files are skipped silently (matches load_env behavior).
+    ``os.environ`` is NOT modified.
+    """
+    merged: dict[str, str] = {}
+    for path in paths:
+        if not Path(path).is_file():
+            continue
+        merged.update(parse_env_file(str(path)))
+    return merged
+
+
+def _needs_quoting(value: str) -> bool:
+    if not value:
+        return False
+    if value != value.strip():
+        return True
+    return any(ch in value for ch in (" ", "\t", "\n", "#", '"', "'"))

@@ -3,7 +3,7 @@ import tempfile
 from pathlib import Path
 
 import pytest
-from philiprehberger_env_file import load_env, parse_env_file
+from philiprehberger_env_file import dump_env, load_env, merge_env, parse_env_file
 
 
 def _write_env(content: str) -> str:
@@ -96,3 +96,58 @@ def test_escape_sequences_in_double_quotes():
     result = parse_env_file(path)
     assert result["KEY"] == "line1\nline2"
     os.unlink(path)
+
+
+def test_dump_env_roundtrip(tmp_path: Path):
+    data = {"FOO": "bar", "BAZ": "qux"}
+    out = tmp_path / "out.env"
+    dump_env(data, out)
+    assert parse_env_file(str(out)) == data
+
+
+def test_dump_env_quotes_whitespace(tmp_path: Path):
+    out = tmp_path / "out.env"
+    dump_env({"FOO": "value with space"}, out)
+    text = out.read_text(encoding="utf-8")
+    assert 'FOO="value with space"' in text
+    assert parse_env_file(str(out)) == {"FOO": "value with space"}
+
+
+def test_dump_env_roundtrip_embedded_quotes(tmp_path: Path):
+    out = tmp_path / "out.env"
+    data = {"FOO": 'a "quoted" b'}
+    dump_env(data, out)
+    assert parse_env_file(str(out)) == data
+
+
+def test_dump_env_invalid_key_raises(tmp_path: Path):
+    with pytest.raises(ValueError):
+        dump_env({"BAD KEY": "x"}, tmp_path / "out.env")
+
+
+def test_dump_env_creates_parent_dirs(tmp_path: Path):
+    out = tmp_path / "nested" / "sub" / "out.env"
+    dump_env({}, out)
+    assert out.is_file()
+
+
+def test_merge_env_later_overrides_earlier(tmp_path: Path):
+    f1 = tmp_path / "a.env"
+    f2 = tmp_path / "b.env"
+    f1.write_text("FOO=one\nBAR=keep\n", encoding="utf-8")
+    f2.write_text("FOO=two\nBAZ=new\n", encoding="utf-8")
+    assert merge_env(f1, f2) == {"FOO": "two", "BAR": "keep", "BAZ": "new"}
+
+
+def test_merge_env_missing_path_returns_empty(tmp_path: Path):
+    assert merge_env(tmp_path / "does-not-exist.env") == {}
+
+
+def test_merge_env_does_not_touch_environ(tmp_path: Path):
+    f1 = tmp_path / "a.env"
+    f2 = tmp_path / "b.env"
+    f1.write_text("MERGE_ENV_TEST_KEY=one\n", encoding="utf-8")
+    f2.write_text("MERGE_ENV_TEST_KEY=two\n", encoding="utf-8")
+    assert "MERGE_ENV_TEST_KEY" not in os.environ
+    merge_env(f1, f2)
+    assert "MERGE_ENV_TEST_KEY" not in os.environ

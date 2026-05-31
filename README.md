@@ -38,6 +38,29 @@ config = parse_env_file(".env")
 print(config["DATABASE_URL"])
 ```
 
+### Writing .env files
+
+```python
+from philiprehberger_env_file import dump_env
+
+dump_env(
+    {"DATABASE_URL": "postgres://localhost/db", "DEBUG": "1"},
+    ".env",
+)
+```
+
+Values containing whitespace, ``#``, ``"``, or ``'`` are automatically
+quoted. Pass ``quote=False`` to disable.
+
+### Merging without loading
+
+```python
+from philiprehberger_env_file import merge_env
+
+# Later files override earlier ones; os.environ is untouched
+config = merge_env(".env", ".env.local")
+```
+
 ### Supported Syntax
 
 ```bash
@@ -66,6 +89,8 @@ HOST=localhost # this is a comment
 |------------------|-------------|
 | `load_env(*paths, override=True)` | Load .env files into `os.environ`, returns dict of loaded vars |
 | `parse_env_file(path)` | Parse a .env file, returns dict without modifying environment |
+| `dump_env(data, path, quote=True)` | Write a dict to a .env file, auto-quoting values that need it |
+| `merge_env(*paths)` | Parse multiple .env files into one dict; missing files are skipped, `os.environ` is not modified |
 
 ## Development
 
